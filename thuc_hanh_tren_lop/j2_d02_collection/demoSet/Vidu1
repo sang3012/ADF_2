@@ -1,0 +1,34 @@
+/*
+Demo Set
+ */
+package demoSet;
+
+import java.util.*;
+
+public class Vidu1 {
+
+    public static void main(String[] args) {
+        //tao 1 ds ten sinh vien
+        List<String> ds = Arrays.asList("Hien", "Minh", "Thinh", "Phat", "Trieu", "Thinh", null);
+
+        Set<String> ds2 = new HashSet<>(ds); // này là in danh sách sinh viên mà trong tập Set
+        
+        
+        //in ds sinh vien trog tap List
+        System.out.println("*** Danh sach sinh vien - List");
+        ds.forEach(System.out::println);
+        
+        //in ds sinh vien trong tap Set
+        System.out.println("*** Danh sach sinh vien - Set");
+        ds2.forEach(System.out::println); 
+/* -> Set là nó không cho trùng và thứ tự không theo đúng index mà mình nhập vô ( ngẫu nhiên )
+vì nó dùng thuật toán hàm BAM để cấp phát bộ nhớ cho nên vị trí lưu trữ của nó là ngẫu nhiên luôn 
+nó không phải là theo chỉ số index của mình nữa đâu ( cho nên người ta nói là: muốn 
+làm việc với tập hợp theo chỉ số index giống như là Array thì mình dùng list 
+    Còn set là anh nào giống nhau thì nó loại ra - bởi vì là chuỗi thì có tính thứ tự rồi 
+bản thân chuỗi kí tự là có tính thứ tự - bản thân của 2 chuỗi là có tính thứ tự, 
+còn nếu là 2 đối tượng là mình phải lập trình trên một số phương thức để phân biệt sự
+giống và khác nhau  
+*/
+    }
+}
