@@ -1,0 +1,260 @@
+/*
+    Quan ly danh sach san pham trong hashmap
+ */
+package demoMap;
+import data.*;
+import data.Product;
+import java.util.*;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+public class ProductMap {
+
+    HashMap<String, Product> ds = new HashMap<>();
+    String fname = "E:/sanpham.txt"; // này là lưu trong tập tin ( cái lúc mà ghi file thì nó sẽ tạo ra, chưa có thì nó sẽ tạo ra còn có rồi nó sẽ ghi đè lên ) 
+    /*
+- Này là mình xây dựng ra một cái cấu trúc Generic có cột Key và cột Value 
+- Key của mình là sẽ đóng vai trò là mã sản phẩm, biết mã sản phẩm thì sẽ biết sản phẩm tương ứng
+Mà mã sản phẩm là chuỗi thì cái phần Genneric này là cột 1 là String và cột 2 là Product 
+    */
+
+    public ProductMap() {
+        readText(); // gọi hàm read ( khi mà tạo ra đối tượng ProductMap này nè thì tự động cái hàm này nó sẽ được thực thi ) 
+    }
+    
+
+    public void add() { // thêm một sản phẩm mới 
+        Scanner sc = new Scanner(System.in);
+        Product p = new Product();
+
+        //nhap id
+        while (true) {
+            System.out.println("Nhap id: ");
+            p.id = sc.nextLine().trim();
+
+            if (ds.containsKey(p.id)) { // kiểm tra id nó có hay chưa 
+                System.out.println("  >> Ma so da ton tai. Vui long nhap lai !");
+                continue;
+            }
+            break;
+        }
+
+        //nhap ten sp
+        System.out.println("Nhap name: ");
+        p.name = sc.nextLine().trim();
+
+        //nhap don gia
+        while (true) {
+            try {
+                System.out.println("Nhap price: ");
+                p.price = Integer.parseInt(sc.nextLine().trim());
+                if (p.price < 0) {
+                    throw new NumberFormatException("Don gia phai >=0 !!!");
+                }
+                break;
+
+            } catch (Exception e) {
+                System.out.println("Loi: " + e.getMessage());
+            }
+        }
+
+        //dua san pham moi vo ds sau khi nhập xong số liệu của sản phẩm
+        ds.put(p.id, p);
+        System.out.println("Da them san pham moi vo HT. \n");
+        /*
+        Nó là một cái Map cho nên mình đưa dữ liệu bằng hàm put 
+        put thì nó nhận số liệu ở 2 cột: cột 1 : key - id, cột 2 : sản phẩm có cái id
+        */
+    }
+    
+    //hàm in danh sách sản phẩm 
+    public void display(){
+        if(ds.isEmpty()){
+            System.out.println(" >> HT chua co du lieu");
+            return;
+        }
+        
+        System.out.println("\n *** Danh sach san pham *** ");
+        ds.values().forEach(System.out::println);
+        // cột value là cột sản phẩm cho nên lấy dữ liệu ở cột thứ 2 ra 
+
+    }
+    /*
+    Còn xóa sản phẩm thì remove theo Key: cho tôi cái Key thì tôi sẽ xóa sản phẩm đó 
+    */
+    
+    //ham ghi ds vo tap tin van ban
+    public void saveText(){     
+        try {
+            
+            PrintStream ps = new PrintStream(fname); // tạo ra một đối tượng PrintStream 
+//            ds.values().forEach(ps::println); // cách viết ngắn gọn 
+            for (Product item : ds.values()) { // này là ghi tường minh luôn, values là nguyên một đối tượng Product 
+                ps.println(item);
+            }
+            ps.close();
+/* 
+    get(Key) -> này là lấy một dòng bất kì 
+    - VD như là đi tìm mã số sản phẩm p3 đi thì mình sẽ biết sản phẩm đó là cái gì thì dùng get(Key)
+thì nó sẽ trả về một đối tượng có mã số là p3 ( giống như search - tìm sp hay là mã số là phải get )
+*/
+            
+            //xem noi dung tap tin trong notepad 
+            Runtime r = Runtime.getRuntime(); // khi ghi cái này thì nó sẽ tung ra Exception rồi mình cho thêm vô 
+            r.exec("notepad   " + fname);
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ProductMap.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ProductMap.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    /*
+    Thấy khi mà xuất dữ liệu ra màn hình thì mình dùng là System.out.println 
+    - System là một cái lớp hệ thống của Java lang, nó có 2 cái: một là in , 2 là out và error 
+    - System.out : tương đượng là print stream : luồng in  - default của nó là out ra màn hình. Nhưng mà
+thay vì nó ra monitor thì giờ mình muốn ra một tập tin thì cái print stream này mình sẽ kết nối với file name
+    khi mà nó kết với một file name thì nó sẽ đẩy ra một tập tin 
+    
+    - PrintStream này khi mà khởi tạo nó thì nối với một cái chuỗi thì cái chuỗi này là tên tập tin nào đó
+hoặc là một đối tượng file thì nó cũng nối với một cái tập tin và tất cả mọi lệnh print của mình thì nó 
+sẽ in ra tập tin này  
+    
+    - Bình thường PrintStream nó nối lại với monitor thì câu lệnh Print của mình sẽ xuất ra màn hình,
+giờ mình hướng nó về tập tin, cụ thể là tập tin có tên nào đó nằm trong biến fname thì tất cả các cái 
+    yêu cầu println của mình thì nó sẽ chuyển về tập tin này hết 
+    
+    - System.in : input stream : luồng nhập  - 
+    */
+    /*
+    hàm của nó trả về -1 có nghĩa là end of file ( là do cách hàm đó nó viết như vậy ) 
+    */
+    
+    
+    
+    
+    // hàm đọc tập tin văn bản, phân tích dữ liệu, lưu vô danh sách 
+    public void readText(){
+        try {
+            String[] items = null; // tạo ra một cái mảng chuỗi 
+            String line = null;
+            BufferedReader br = new BufferedReader(new FileReader(fname)); // lúc mà dùng BufferedReader thì nó sẽ cài cái hàm để mình đọc nguyên một dòng 
+            while(br.ready()) { // hàm này bằng true là có nghĩa là còn dữ liệu để mình đọc ( còn dữ liệu để đọc thì là true còn hết dữ liệu rồi nó sẽ trả về false ) 
+                line = br.readLine().trim(); // đọc từng dòng ( và trim để lượt bỏ khỏi những khoảng trắng đầu và cuối chuỗi ) 
+                System.out.println(line); // rồi in nội dung của dòng này ra , xong rồi mình gọi hàm này ra
+                
+                // đến đây là mình chỉ mới đọc từng dòng rồi in ra thôi
+                // Bây giờ mình mới quăng nó vô lại HashMap 
+                
+                /*
+    HashMap là thấy cấu trúc dữ liệu của nó có 2 cột: cột 1 là mã sản phẩm, cột 2 là đối tượng sản phẩm 
+trong khi mình đọc dữ liệu ra chỉ là một chuỗi văn bản thôi, chứ đâu phải là mình đọc ra một đối tượng 
+sản phẩm đâu --> Nên nhiệm vụ là mình phải phân tích cái chuỗi dữ liệu này để mà tạo thành ra một cái
+đối tượng tương ứng 
+    - Mình đọc được một chuỗi, thành một String, với cái chuỗi này thì mình mới tạo ra một 
+đối tượng sản phẩm, một cái Product p nội dung của nó là một cái bộ p1, Laptop, 200
+từ chuỗi này mình phải tạo ra một đối tượng 
+    --> Mình phải biến cái đó ra thành một cái mảng, một cái Array, có 3 phần tử, rồi
+từ cái này mới new một cái Product mà ở đó mã của nó a[0],a[1],a[2], bẻ nó ra thành 3 phần tử con,
+bẻ nó ra dựa vào dấu , xong rồi tạo ra một cái sản phẩn gồm có 3 phần tử a[0],a[1],a[2]
+nhưng mà mảng của nó là mảng chuỗi, trong khi phần tử thứ 3 của mình là số -> nên mình phải ép kiểu (parseInt)
+                */
+                
+                // chuyển chuỗi thành mảng dựa vào kí hiệu phân cách 
+                items = line.split(","); // cắt chuỗi tại các vị trí [,] => mảng 
+                
+                if(items.length == 3 ){ // nếu số phần tử = 3 ( có nghĩa là mình cắt ra được 3 phần tử ) thì mình mới xử lí, tạo ra đối tượng sản phẩm Product 
+                    Product p = new Product();
+                    p.id = items[0].trim();
+                    p.name = items[1].trim();
+                    p.price = Integer.parseInt(items[2].trim());
+                    
+                    //đưa vô danh sách 
+                    ds.put(p.id, p);
+                    
+                    // dọc dữ liệu dạng văn bản nó phức tạp hơn là đọc theo dạng Binary có trong mẫu 
+                }
+            }
+
+            br.close(); // hết vòng lập mình đóng file lại 
+            
+            /*
+            Khi mà thi thực hành ngoài Collection ra thì mình phải ghi vô file hoặc là ghi vô
+            các bảng database ( có nghĩa là phải lưu dữ liệu được và đọc dữ liệu được ) 
+            */
+            
+            
+            
+/* 
+            
+            
+            lúc mà dùng BufferedReader thì nó sẽ cài cái hàm để mình đọc nguyên một dòng 
+    - Trong bài mẫu là dùng FileInputStream ( trong bài mẫu ) là đọc một byte hay là đọc nhiều byte 
+    - Còn dùng file Reader là đọc một kí tự hay đọc nhiều kí tự hay là một mảng kí tự 
+    - Trong bài này thì cấu trúc của cái file sanpham.txt là nó có nhiều dòng, và tôi muốn đọc theo từng dòng
+chứ không muốn đọc từ kí tự hay là một mảng kí tự, Có nghĩa là phải dùng cái lớp nào mà có cài đặt mà đọc dòng 
+    - Thì trong io nó sẽ có cái lớp là BufferedReader nó cài sẵn cái hàm đọc từng dòng, từng dòng 
+thì bắt buộc đầu vào của bufferreader nó phải là một đối tượng file ( mình đang đọc filereader thì nó
+phải đi chung với filereader ) còn nếu như đi theo InputStream thì phải đi theo là file InputStream ( cái luật của nó )
+    - Binary đi với Binary, Character đi với Character ( trong TH này là phân tích theo Character ) 
+    - Khi mà lập trình là phải tìm coi cái class mà nó phục vụ được cái mục tiêu mà mình phân tích và xử lí 
+    - FileReader thì không có hàm readline, FileinputStream thì không có hàm read line , nó chỉ có hàm read thôi
+hoặc đọc một byte, đọc một mảng byte, đọc 1 kí tự hoặc là đọc một mảng kí tự 
+    - Còn này là muốn đọc một dòng thì kết thúc bằng enter
+            
+            
+    - Cơ chế hoạt động của BufferReader là một cái dạng đặc biệt, một cái class đặt biệt mà nó
+sẽ dùng theo cái cơ chế là trainning , nó sẽ hoạt động trên một đối tượng nào đó đã được open rồi
+một cái stream hay một cái file nào đó đã được open rồi, có nghĩa là sẽ mở một cái file rồi mới dùng
+BufferReader nối cái file đó rồi mới sử đụng được, nó là dạng bộ đệm là vậy ( phải có sẵn mới làm được )
+            - Kiểm tra tập tin ( trong TH này là đã có rồi ) 
+            */
+
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ProductMap.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ProductMap.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    
+    
+
+    // tìm sản phẩm theo tên:
+    void display(String nameSearch) {
+        /*
+        HashMap x = (HashMap) ds.entrySet().stream().filter(item->item.getKey().contains(nameSearch)).map(Map.Entry::getValue)
+                     .collect(Collectors.toList());;
+        if (x.isEmpty()) {
+            System.out.println("\n  >>> NOT FOUND <<<");
+        }
+        else {
+            System.out.println("\n >>> PRODUCT LIST <<<");
+            x.values().forEach(System.out::println);
+        }
+
+if(ds.isEmpty()){
+            System.out.println(" >> HT chua co du lieu");
+            return;
+        }
+        
+        int cntName = 0;
+        System.out.println("\n  *** Danh sach san pham ***");
+        for (int i = 0; i < ds.size(); i++) {
+            if(ds.get(i).name.contains(nameSearch)){
+                System.out.println(ds.get(i));
+                cntName++;
+            }
+        }
+    
+        if(cntName==0){
+            System.out.printf(" KO tim thay san pham co ten %s !", nameSearch);
+        }
+     */   
+    }
+
+}
