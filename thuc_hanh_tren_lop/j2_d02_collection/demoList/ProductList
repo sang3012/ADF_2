@@ -1,0 +1,160 @@
+/*
+Quan ly danh sach san pham trong List
+ */
+package demoList;
+
+import java.util.*;
+import data.*;
+import java.util.stream.Collectors;
+
+public class ProductList {
+    
+    List<Product> ds = new ArrayList<>(); // tạo ra một cái list chứa sản phẩm và ở đây ta lưu trong ArrayList 
+/*
+--> thì đây là viết theo hình thức là Generic, tức là List này chỉ chứa các Product     
+- Nếu mà không có cái khai báo là <Product> thì cái List này chứa đối tượng, 
+đối tượng khi mà lôi ra thì phải ép kiểu, nếu mà không dùng cái khai báo là Generic này <> thì List này chỉ chứa đối tượng thôi 
+quăng cái gì vô cũng được nhưng mà khi mà lôi ra thì ép kiểu , mà ép kiểu thì dễ sai
+    - Cho nên người ta thường khuyến khích mình là nên định nghĩa tập hợp Generic - là tập hợp chứa các dữ liệu cùng kiểu Product
+nếu mà quăng vô khác kiểu thì sẽ báo lỗi 
+    */
+    public void add() {
+        
+        Product p = new Product();
+        
+        //nhap du lieu cho san pham p
+        input(p);
+        
+        //dua vo danh sach
+        ds.add(p);
+        
+        //tb thanh cong
+        System.out.println("Da them san pham moi vo HT !");
+
+    }
+
+    private void input(Product p) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Nhap Id: ");
+        p.id = sc.nextLine().trim();
+
+        System.out.println("Nhap Name: ");
+        p.name = sc.nextLine().trim();
+
+        while (true) {
+            try {
+                System.out.println("Nhap Price: ");
+                p.price = Integer.parseInt(sc.nextLine().trim());
+                break;
+            } catch (Exception e) {
+                System.out.println("Loi: " + e.getMessage());
+            }
+        }
+
+    }
+    
+    public void display(){
+        if(ds.isEmpty()){
+            System.out.println(" >> HT chua co du lieu");
+            return;
+        }
+        
+        System.out.println("\n  *** Danh sach san pham ***");
+        ds.forEach(System.out::println);
+    }
+    
+    
+    //tim san pham theo ten
+    public void display(String nameSearch){
+        if(ds.isEmpty()){
+            System.out.println(" >> HT chua co du lieu");
+            return;
+        }
+        
+        int cntName = 0;
+        System.out.println("\n  *** Danh sach san pham ***");
+        for (int i = 0; i < ds.size(); i++) {
+            if(ds.get(i).name.contains(nameSearch)){
+                System.out.println(ds.get(i));
+                cntName++;
+            }
+        }
+    
+        if(cntName==0){
+            System.out.printf(" KO tim thay san pham co ten %s !", nameSearch);
+        }
+        
+        
+        /* Nâng cấp lên  ***/
+        List x = ds.stream().filter(item->item.name.contains(nameSearch)).collect(Collectors.toList()); // -> lúc này là nó trở thành một list rồi 
+// Collector là một cái class thư viện của nó để mà nó tổng hợp dữ liệu, nó thu thập dữ liệu 
+// và nó có một cái phương thức là toList để biến cái stream này ra một cái danh sách 
+        if (x.isEmpty()) {
+            System.out.println("\n  >>> NOT FOUND <<<");
+        }
+        else {
+            System.out.println("\n >>> PRODUCT LIST <<<");
+            x.forEach(System.out::println);
+        }
+/*
+    Tới cái stream là nó sẽ lấy từng phần tử ra xử lí xong rồi thôi, bây giờ muốn nó lấy ra xử lí
+rồi nó lưu lại bên trong cái tập hợp thì mình phải gọi cái hàm là collect và hàm này nó có một
+cái tham số mà chỉ định cách mà mình build ra tập hợp kiểu gì ... nếu muốn là list thì gọi hàm
+    toList của Collector  
+
+    Collectors là một cái class còn toList là một phương thức nằm trong Collectors này
+để nó nhận nhiệm vụ là nó nhặt mấy cái dữ liệu mà nó lấy ra từ stream nó quăng vô một cái danh sách 
+        - Làm quen rồi thì thích viết kiểu này hơn, bây giờ modern của nó là : functional programming 
+    
+*/
+    }
+    
+    //xoa san pham theo ma so
+    public void remove(String masoSP){
+        if(ds.isEmpty()){
+            System.out.println(" >> HT chua co du lieu");
+            return;
+        }
+        
+        Product p = ds.stream().filter(item->item.id.equals(masoSP)).findFirst().orElse(null);
+        
+        if(p==null){
+            System.out.println(" >> KO tim thay san pham muon xoa !!!");
+        }
+        else{
+            ds.remove(p);
+            System.out.println(" >> Da xoa san pham thanh cong !!!");
+        }
+        /* Giải thích câu lệnh stream và lambda: 
+    - findFirst là trả về một đối tượng Product optional -> tìm thấy thì mới trả về một Product được
+cho nên là mình mới kết hợp với orElse , nếu tìm thấy thì nó trả về cái phần tử đầu tiên trong
+    cái danh sách nó tìm ra, ngược lại orElse thì nó trả về giá trị là null - tức là null
+    - Tìm thấy thì nó trả về kết quả là Findfirst còn không tìm thấy là nó trả về kết
+    quả là null, phải kết 2 cái đó lại với nhau 
+    - Tìm được là nó trả về một Product có nội dung, nó tìm ra phần tử đó thì nó 
+    gán cho thằng p còn không tìm ra thì nó gán null này cho p ( giống if-else ) 
+    - Filter là nó ra một tập hợp, nó tìm hết tất cả các phần tử mà thỏa điều kiện này
+    - Tìm theo tên thì lúc đó nó mới ra một stream có nghĩa là một Collection- một tập
+dữ liệu, thì mới chạy trên stream này. Tìm 1 thằng thì thấy thằng đầu tiên là được rồi 
+    - Thì đã nói nếu mà dùng hàm findFirst là trả về một optional, optional có nghĩa là có hay
+không cũng được, cho nên kết quả trả về là một optional product chứ không phải là một Product được 
+nếu mà tới thằng findFirst dừng thì kết quả trả về của mình là Product optional, chứ không phải là 
+một Product, nhưng mà mình muốn trả về là một Product thì phải liệt kê luôn trong trường hợp ngược lại 
+không tìm ra thì trả về giá trị null - có nghĩa là thằng Product thì có thể là một giá trị null
+có thể là một đối tượng Product ( vì kết quả trả về findFirst là có thể nó không tìm ra mà ) 
+        
+        - Nhớ là danh sách của mình là chứa một cái Product chứ không phải là một optional Product 
+        
+        -Nói về findFirst:  Nó là một kiểu dữ liệu optional, nhưng mà cái ruột của nó có thể là một anh sinh viên,
+cái ruột của nó, cái ruột của nó có thể là một quyển sách , ... -> nó chỉ là một dạng là bộ chứ kiểu dữ liệu thôi
+        mà trong đó cái phần nội dung của nó có thể là một giá trị cụ thể hoặc là bằng null gì cũng được, nhưng
+        mà kiểu dữ liệu của nó là 1 optional chứ không phải là kiểu dữ liệu Product 
+        
+        - Nếu tới findFirst thôi thì nó chỉ ra là một cái optional chứ không phải là Product
+    cho nên là phải kết hợp với orElse nữa  bởi vì không tìm thấy thì nó sẽ trả về null 
+        */
+        
+    }
+    
+}
